@@ -16,8 +16,9 @@ int main(int argc, char **argv)
   size_t size;
   char *trace_file_name;
   int trace_view_on = 0;
+  int prediction_method = 0;
   
-  
+  buffer[7] = (struct trace_item*)malloc(sizeof(struct trace_item*) * 7); //we need 7 buffers, correct? change if I'm wrong
   
   unsigned char t_type = 0;
   unsigned char t_sReg_a= 0;
@@ -47,6 +48,9 @@ int main(int argc, char **argv)
   }
 
   trace_init();
+  
+  if (prediction_method == 1) 
+     //initialize prediction table
 
   while(1) {
     size = trace_get_item(&tr_entry);
@@ -56,6 +60,33 @@ int main(int argc, char **argv)
       break;
     }
     else{              /* parse the next instruction to simulate */
+       
+       /* if (~data hazard~){
+               if (trace_view_on)
+                  printf("\n Data Hazard!");
+               ~stall w/ noop~
+          }
+          else if (~control hazard~){
+            if(trace_view_on)
+               printf("\n Control Hazard!");
+            ~flush stages IF1, IF2 & ID ~
+          }
+          else if (~jump hazard~){
+            if(trace_view_on)
+               printf("\n Control Hazard!");
+            ~flush stages IF1, IF2 & ID ~
+          }
+          else if (~structural hazard~){
+            if(trace_view_on)
+               printf("\n Structural Hazard!);
+            ~stakk stages IF1, IF2 & ID ~
+          }
+          else{   //no hazards
+          ~read next instruction~
+          }
+          
+          **/
+       
       cycle_number++;
       t_type = tr_entry->type;
       t_sReg_a = tr_entry->sReg_a;
