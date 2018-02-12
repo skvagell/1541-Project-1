@@ -15,7 +15,7 @@
 #define IDEX 2
 #define EXMEM1 3
 #define MEM1MEM2 4
-#define MEM2WB
+#define MEM2WB 5
 
 int main(int argc, char **argv)
 {
@@ -65,12 +65,29 @@ int main(int argc, char **argv)
     }
     else{              /* parse the next instruction to simulate */
       cycle_number++;
-      t_type = tr_entry->type;
-      t_sReg_a = tr_entry->sReg_a;
-      t_sReg_b = tr_entry->sReg_b;
-      t_dReg = tr_entry->dReg;
-      t_PC = tr_entry->PC;
-      t_Addr = tr_entry->Addr;
+      //I think we should check for control hazards first, 'cause if we flush the whole pipeline, any other hazards are kind of irrelevant
+//      if((buffers[EXMEM1]->type == ti_BRANCH || buffers[EXMEM1]->type == ti_JTYPE) && buffers[IDEXE]->PC != buffers[EXMEM1] + 4){
+      //This doesn't account for branch prediction
+//      	flush(buffers);
+//      }//end if
+
+//      else if(buffers[MEM2WB]->dReg == buffers[IF2ID]->sRegA || buffers[MEM2WB]->dReg == buffers[IF2ID]->sRegB){
+//      	stall(buffers, IDEX);
+//      }
+//
+//      else if((buffers[EXMEM1]->type == ti_LOAD) && ((buffers[EXMEM1]->dReg == buffers[IDEX]->sRegA) || buffers[EXMEM1]->dReg == buffers[IDEX]->sRegB)){
+//      	stall(buffers, EXMEM1);
+//      }
+//
+//      else if((buffers[MEM1MEM2]->type == ti_LOAD) && ((buffers[MEM1MEM2]->dReg == buffers[IDEX]->sRegA) || buffers[EXMEM1]->dReg == buffers[IDEX]->sRegB)){
+//		stall(buffers, MEM1MEM2);
+//      }
+//
+//      else{
+//      	advance(buffers);
+//      }
+//
+//
     }  
 
 // SIMULATION OF A SINGLE CYCLE cpu IS TRIVIAL - EACH INSTRUCTION IS EXECUTED
