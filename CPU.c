@@ -10,7 +10,7 @@
 #include <arpa/inet.h>
 #include "CPU.h" 
 
-#define IF2IF2 0
+#define IF1IF2 0
 #define IF2ID 1
 #define IDEX 2
 #define EXMEM1 3
@@ -66,20 +66,20 @@ int main(int argc, char **argv)
     else{              /* parse the next instruction to simulate */
       cycle_number++;
       //I think we should check for control hazards first, 'cause if we flush the whole pipeline, any other hazards are kind of irrelevant
-//      if((buffers[EXMEM1]->type == ti_BRANCH || buffers[EXMEM1]->type == ti_JTYPE) && buffers[IDEXE]->PC != buffers[EXMEM1] + 4){
+//      if(control_hazard(buffers)){
       //This doesn't account for branch prediction
 //      	flush(buffers);
 //      }//end if
 
-//      else if(buffers[MEM2WB]->dReg == buffers[IF2ID]->sRegA || buffers[MEM2WB]->dReg == buffers[IF2ID]->sRegB){
+//      else if(structural_hazard(buffers)){
 //      	stall(buffers, IDEX);
 //      }
 //
-//      else if((buffers[EXMEM1]->type == ti_LOAD) && ((buffers[EXMEM1]->dReg == buffers[IDEX]->sRegA) || buffers[EXMEM1]->dReg == buffers[IDEX]->sRegB)){
+//      else if(data_hazard_one(buffers)){
 //      	stall(buffers, EXMEM1);
 //      }
 //
-//      else if((buffers[MEM1MEM2]->type == ti_LOAD) && ((buffers[MEM1MEM2]->dReg == buffers[IDEX]->sRegA) || buffers[EXMEM1]->dReg == buffers[IDEX]->sRegB)){
+//      else if(data_hazard_two(buffers)){
 //		stall(buffers, MEM1MEM2);
 //      }
 //
@@ -159,3 +159,34 @@ void advance(struct trace_item* buffers, struct trace_item* entry){
 	}
 	buffers[0] = entry;
 }
+*/
+}
+
+int control_hazard(struct trace_item* buffers){
+	if(((buffers[IDEX]->type == ti_JTYPE) || (buffers[IDEX]->type == ti_BRANCH)) && buffers[IF2ID]->PC != (buffers[IDEX]->PC + 4)){
+		return 1;
+	}
+	return 0;
+}
+
+int structural_hazard(struct trace_item* buffers){
+	if(((buffers[MEM2WB]->dReg == buffers[IF2ID]->sReg_a) || buffers[IF2ID]->sReg_b) && (buffers[MEM2WB]->type != ti_JTYPE && buffers[MEM2WB]->type != ti_BRANCH && buffers[MEM2WB]->type != ti_STORE && buffers[MEM2WB]->type != JRTYPE)){
+		return 1;
+	}
+	return 0;
+}
+
+int data_hazard_one(struct trace_item* buffers){
+	if((buffers[EXMEM1]->type == ti_LOAD) && ((buffers[EXMEM1]->dReg == buffers[IDEX]->sReg_a) || buffers[EXMEM1]->dReg == buffers[IDEX]->sReg_b)){
+		return 1;
+	}
+	return 0;
+}
+
+int data_hazard_two(struct trace_item* buffers){
+	if((buffers[MEM1MEM2]->type == ti_LOAD) && ((buffers[MEM1MEM2]->dReg == buffers[IDEX]->sReg_a) || (buffers[MEM1MEM2]->dReg == buffers[IDEX]->sReg_b))){
+		return 1;
+	}
+	return 0;
+}
+
