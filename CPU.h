@@ -2,6 +2,8 @@
 #ifndef TRACE_ITEM_H
 #define TRACE_ITEM_H
 
+#include <stdlib.h>
+
 // this is tpts
 enum trace_item_type {
 	ti_NOP = 0,
@@ -106,7 +108,7 @@ int write_trace(struct trace_item item, char *fname)
 	fclose(out_fd);
 	if (!n_items) return 0;				/* if no more items in the file, we are done */
 
-		
+
 	return 1;
 }
 
