@@ -140,8 +140,8 @@ int main(int argc, char **argv)
 //
 //
     }
-
-    for(int i = IF2; i <= WB ; i++){
+	int i;
+    for(i = IF2; i <= WB ; i++){
     	print_trace(trace_view_on, cycle_number, &(buffers[i]));
     }
   }
@@ -224,7 +224,8 @@ int branch_table_predict(struct hash_entry table[BRANCH_TABLE_SIZE], unsigned in
 }
 
 void stall(struct trace_item *buffers, struct trace_item NO_OP, int stallPosition){
-	for(int i = WB; i > stallPosition; i--){
+	int i;
+	for(i = WB; i > stallPosition; i--){
 		buffers[i] = buffers[i-1];
 	}
 	//Advance everything ahead of the stall position
@@ -234,12 +235,13 @@ void stall(struct trace_item *buffers, struct trace_item NO_OP, int stallPositio
 }
 
 void flush(struct trace_item *buffers, struct trace_item NO_OP, struct trace_item *queue){
-	for(int i = WB; i >= EX; i--){
+	int i;
+	for(i = WB; i >= EX; i--){
 		buffers[i] = buffers[i-1];
 	}
 	//Advance everything ahead of the branch/jump
 	buffers[EX] = NO_OP;
-	for(int i = IF2; i < EX; i++){
+	for(i = IF2; i < EX; i++){
 		queue[i] = buffers[i];
 	        buffers[i].type = ti_NOP;
 	}
@@ -247,7 +249,8 @@ void flush(struct trace_item *buffers, struct trace_item NO_OP, struct trace_ite
   }
 
 void advance(struct trace_item *buffers){
-	for(int i = WB; i > IF2; i--){
+	int i;
+	for(i = WB; i > IF2; i--){
 		buffers[i] = buffers[i-1];
 	}
 }
@@ -323,7 +326,8 @@ int get_next_instr(struct trace_item *tr_entry) {
 }
 
 int is_empty(struct trace_item *buffers){
-	for(int i = 0; i < 6; i++){
+	int i;
+	for(i = 0; i < 6; i++){
 		if(buffers[i].type != ti_NOP){
 			return 1;
 		}
