@@ -1,0 +1,5 @@
+-I believe CPU.c works as it should when run on CSSD's Unix cluster. I reported the results in a table (as required). 
+-Didn't have time to report the results of changing the table size to 128. I can do that after class. 
+-I am not entirely sure how to interpret the results (I think we are getting what we should
+but am not 100% positive)- please add interpretation to the results document.
+-Let me know if I need to do anything else!
