@@ -46,7 +46,7 @@ int main(int argc, char **argv)
   struct trace_item buffers[6];
   struct trace_item queue[3];
 
-  struct trace_item *tr_entry;
+  struct trace_item *tr_entry = malloc(sizeof(struct trace_item));
 
   struct trace_item NO_OP;
   NO_OP.type = ti_NOP;
@@ -57,6 +57,9 @@ int main(int argc, char **argv)
   char *trace_file_name;
   int trace_view_on = 0;
   int prediction_method = 0;
+  int prediction = 0;
+  int was_taken = 0;
+
 
   unsigned int cycle_number = 0;
 
@@ -100,13 +103,15 @@ int main(int argc, char **argv)
     }
     else {              /* parse the next instruction to simulate */
       cycle_number++;
-      buffers[IF2] = *tr_entry;//Move the new instruction into the pipeline
+      
+//      buffers[IF2] = *tr_entry;//Move the new instruction into the pipeline
       /* Handle possible control hazard first */
       if ((buffers[EX].type == ti_JTYPE) || (buffers[EX].type == ti_JRTYPE) || (buffers[EX].type == ti_BRANCH)) {
+	      printf("Buffers[EX].type = %s", buffers[EX].type);
         /* If the branch was predicted to be taken */
-        int prediction = branch_table_predict(branch_table, buffers[EX].PC, prediction_method);
+        prediction = branch_table_predict(branch_table, buffers[EX].PC, prediction_method);
         /* Check if it was really taken */
-        int was_taken = buffers[ID].PC != (buffers[EX].PC + 4);
+        was_taken = buffers[ID].PC != (buffers[EX].PC + 4);
 
         /* Remember branching result in the predictor */
         if (was_taken) {
@@ -119,28 +124,35 @@ int main(int argc, char **argv)
         if (prediction != was_taken) {
           /* Flush */
           flush(buffers, NO_OP, queue);
+	  	printf("Control hazard, stall");
         }
       }
 
       if(structural_hazard(buffers)){
       	stall(buffers, NO_OP, EX);
+		printf("Structural hazard, stall");
       }
 //
       else if(data_hazard_one(buffers)){
       	stall(buffers, NO_OP, MEM1);
+		printf("Data hazard one, stall");
       }
 //
       else if(data_hazard_two(buffers)){
 		    stall(buffers, NO_OP, MEM2);
+			    printf("Data hazard two, stall");
       }
 //
       else{
       	advance(buffers);
+//		printf("Advance");
       }
+
+      buffers[IF2] = *tr_entry;
 //
 //
     }
-	int i;
+    int i;
     for(i = IF2; i <= WB ; i++){
     	print_trace(trace_view_on, cycle_number, &(buffers[i]));
     }
@@ -224,8 +236,7 @@ int branch_table_predict(struct hash_entry table[BRANCH_TABLE_SIZE], unsigned in
 }
 
 void stall(struct trace_item *buffers, struct trace_item NO_OP, int stallPosition){
-	int i;
-	for(i = WB; i > stallPosition; i--){
+	for(int i = WB; i > stallPosition; i--){
 		buffers[i] = buffers[i-1];
 	}
 	//Advance everything ahead of the stall position
@@ -258,7 +269,7 @@ void advance(struct trace_item *buffers){
 
 
 int structural_hazard(struct trace_item *buffers){
-	if((buffers[WB].type == ti_RTYPE || buffers[WB].type != ti_ITYPE || buffers[WB].type != ti_LOAD) &&(buffers[WB].dReg == buffers[ID].sReg_a || buffers[WB].dReg == buffers[ID].sReg_b)){
+	if((buffers[WB].type == ti_RTYPE || buffers[WB].type == ti_ITYPE || buffers[WB].type == ti_LOAD) &&(buffers[WB].dReg == buffers[ID].sReg_a || buffers[WB].dReg == buffers[ID].sReg_b)){
 		return 1;
 	}
 	return 0;
