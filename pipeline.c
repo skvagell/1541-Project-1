@@ -11,10 +11,14 @@
 #include "CPU.h"
 
 
-#define IF2 0 //IF1-IF2 buffer, contains info about instruction currently in IF2
-#define ID 1//IF2-ID buffer, contains info about instruction currently in ID
-#define EX 2//ID-EX buffer, contains info about instruction currently in EX
-#define MEM1 3//EX-MEM1 buffer, contains info about instruction currently in Mem1
+#define IF2 0
+ //IF1-IF2 buffer, contains info about instruction currently in IF2
+#define ID 1
+//IF2-ID buffer, contains info about instruction currently in ID
+#define EX 2
+//ID-EX buffer, contains info about instruction currently in EX
+#define MEM1 3
+//EX-MEM1 buffer, contains info about instruction currently in Mem1
 #define MEM2 4 //MEM1-MEM2 buffer, contains info about instruction currently in Mem2
 #define WB 5 //MEM2-WB buffer, contains info about instruction currently in WB
 
@@ -124,23 +128,23 @@ int main(int argc, char **argv)
         if (prediction != was_taken) {
           /* Flush */
           flush(buffers, NO_OP, queue);
-	  	printf("Control hazard, stall");
+//	  	printf("Control hazard, flush");
         }
       }
 
       if(structural_hazard(buffers)){
       	stall(buffers, NO_OP, EX);
-		printf("Structural hazard, stall");
+//		printf("Structural hazard, stall");
       }
 //
       else if(data_hazard_one(buffers)){
       	stall(buffers, NO_OP, MEM1);
-		printf("Data hazard one, stall");
+//		printf("Data hazard one, stall");
       }
 //
       else if(data_hazard_two(buffers)){
 		    stall(buffers, NO_OP, MEM2);
-			    printf("Data hazard two, stall");
+//			    printf("Data hazard two, stall");
       }
 //
       else{
